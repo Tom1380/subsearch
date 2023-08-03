@@ -28,6 +28,7 @@ def get_subs(youtube_id):
         "outtmpl": uuid,
         'logtostderr': True,
         'skip_download': True,
+        'writeautomaticsub': True,
         'writesubtitles': True,
         'sub_langs': 'en.*',
     }
