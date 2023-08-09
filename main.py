@@ -48,6 +48,15 @@ class DownloadInfo:
     def title(self):
         return self.info_dict.get('title', None)
 
+    def upload_date(self):
+        return self.info_dict.get('upload_date', None)
+
+    def channel(self):
+        return self.info_dict.get('uploader', None)
+
+    def id(self):
+        return self.info_dict.get('id', None)
+
 
 def download_subs(youtube_id):
     uuid = generate_uuid()
@@ -119,6 +128,9 @@ def build_doc(filename):
     paragraphs = root.findall('.//{http://www.w3.org/ns/ttml}p')
 
     return {
+        'title': info.title(),
+        'channel': info.channel(),
+        'upload_date': info.upload_date(),
         'subs':
             '\n'.join([
                 extract_text(paragraph_element)
