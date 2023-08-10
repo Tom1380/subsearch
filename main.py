@@ -64,6 +64,9 @@ class DownloadInfo:
     def id(self):
         return self.get('id')
 
+    def language(self):
+        return self.get('language')
+
 
 def download_subs(youtube_id):
     uuid = generate_uuid()
@@ -156,6 +159,7 @@ def build_doc(info):
         'title': info.title(),
         'channel': info.channel(),
         'upload_date': info.upload_date(),
+        'language': info.language(),
         'timestamps': timestamps,
         'subs': subs,
     }
