@@ -84,8 +84,9 @@ def download_subs(youtube_id):
         return None
 
 
-def save_to_es(es, doc):
-    es.index(index="test-index", document=doc)
+def save_to_es(es, doc, id):
+    assert id is not None
+    es.index(index="new2-index", document=doc, id=id)
 
 
 def trim_newlines(text):
@@ -174,4 +175,4 @@ for url in tqdm(urls):
 
     os.remove(info.filename)
 
-    save_to_es(es, doc)
+    save_to_es(es, doc, id=info.id())
