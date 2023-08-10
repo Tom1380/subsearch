@@ -122,21 +122,36 @@ def extract_text(paragraph_element):
     return text
 
 
-def build_doc(filename):
-    tree = ET.parse(filename)
+def build_subs_and_timestamps(paragraphs):
+    index_in_text = 0
+    timestamps = list()
+    subs = []
+    for p in paragraphs:
+        phrase = extract_text(p)
+        subs.append(phrase)
+        timestamps.append((p.get('begin'), index_in_text))
+        # Because a newline will be added when the list is joined.
+        index_in_text += len(phrase) + 1
+
+    subs = '\n'.join(subs)
+
+    return subs, timestamps
+
+
+def build_doc(info):
+    tree = ET.parse(info.filename)
     root = tree.getroot()
 
     paragraphs = root.findall('.//{http://www.w3.org/ns/ttml}p')
+
+    subs, timestamps = build_subs_and_timestamps(paragraphs)
 
     return {
         'title': info.title(),
         'channel': info.channel(),
         'upload_date': info.upload_date(),
-        'subs':
-            '\n'.join([
-                extract_text(paragraph_element)
-                for paragraph_element in paragraphs
-            ]),
+        'timestamps': timestamps,
+        'subs': subs,
     }
 
 
@@ -160,18 +175,9 @@ for url in tqdm(urls):
         print('No subtitles available?')
         continue
 
-    print(info.url)
-    print(info.title)
-
-    doc = build_doc(info.filename)
+    doc = build_doc(info)
 
     print(doc)
-
-    json.dump(
-        doc,
-        io.open(f'{info.filename}.json', mode='w', encoding='utf-8'),
-        ensure_ascii=False
-    )
 
     os.remove(info.filename)
 
