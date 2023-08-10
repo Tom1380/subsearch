@@ -23,13 +23,17 @@ def generate_uuid():
     return str(uuid.uuid4())
 
 
-# TODO It doesn't make sense to check all files if we're just going to return the first match.
 def find_file(uuid):
     prefixed = [
         filename
         for filename in os.listdir('.')
         if filename.startswith(uuid)
     ]
+
+    # I don't know if this situation can happen,
+    # I'd like to only download the "best" subtitle file available.
+    if len(prefixed) > 1:
+        print('More than one subtitle file found.')
 
     try:
         return prefixed[0]
