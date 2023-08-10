@@ -42,20 +42,23 @@ class DownloadInfo:
         self.filename = filename
         self.info_dict = info_dict
 
+    def get(self, keyword):
+        return self.info_dict.get(keyword, None)
+
     def url(self):
-        return self.info_dict.get('url', None)
+        return self.get('url')
 
     def title(self):
-        return self.info_dict.get('title', None)
+        return self.get('title')
 
     def upload_date(self):
-        return self.info_dict.get('upload_date', None)
+        return self.get('upload_date')
 
     def channel(self):
-        return self.info_dict.get('uploader', None)
+        return self.get('uploader')
 
     def id(self):
-        return self.info_dict.get('id', None)
+        return self.get('id')
 
 
 def download_subs(youtube_id):
