@@ -75,7 +75,6 @@ def download_subs(youtube_id):
         info_dict = ydl.extract_info(
             youtube_id,
             download=True,
-            process=True
         )
 
     if (filename := find_file(uuid)) is not None:
