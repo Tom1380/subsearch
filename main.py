@@ -87,9 +87,16 @@ def download_subs(youtube_id):
             download=True,
         )
 
-    if (filename := find_file(uuid)) is not None:
+    try:
+        req_subtitles = list(info_dict['requested_subtitles'].values())
+        # I don't know if this situation can happen,
+        # I'd like to only download the "best" subtitle file available.
+        if len(req_subtitles) > 1:
+            print('More than one subtitle file found.')
+
+        filename = req_subtitles[0]['filepath']
         return DownloadInfo(filename, info_dict)
-    else:
+    except (KeyError, TypeError):
         return None
 
 
