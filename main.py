@@ -89,7 +89,11 @@ def download_subs(youtube_id):
         )
 
     try:
-        req_subtitles = list(info_dict['requested_subtitles'].values())
+        req_subtitles = [
+            sub
+            for sub in info_dict['requested_subtitles'].values()
+            if sub['ext'] == 'ttml'
+        ]
         # I don't know if this situation can happen,
         # I'd like to only download the "best" subtitle file available.
         if len(req_subtitles) > 1:
@@ -97,7 +101,7 @@ def download_subs(youtube_id):
 
         filename = req_subtitles[0]['filepath']
         return DownloadInfo(filename, info_dict)
-    except (KeyError, TypeError):
+    except:
         return None
 
 
