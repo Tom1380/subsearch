@@ -77,7 +77,8 @@ def download_subs(youtube_id):
         'skip_download': True,
         'writeautomaticsub': True,
         'writesubtitles': True,
-        'sub_langs': 'en.*',
+        # Ignore live chats, which are considered as subtitles for some reason.
+        'subtitleslangs': ['en.*', '-live_chat'],
         'subtitlesformat': 'ttml',
     }
 
