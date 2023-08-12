@@ -120,6 +120,7 @@ def download_subs(youtube_id):
         'subtitlesformat': 'ttml',
     }
 
+    # TODO handle videos that still have to premiere.
     with YoutubeDL(ctx) as ydl:
         info_dict = ydl.extract_info(
             youtube_id,
