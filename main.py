@@ -88,6 +88,7 @@ def download_subs(youtube_id):
         )
 
     try:
+        # TODO delete the files from the ignored subtitles.
         req_subtitles = [
             sub
             for sub in info_dict['requested_subtitles'].values()
