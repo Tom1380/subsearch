@@ -61,6 +61,9 @@ class DownloadInfo:
     def channel(self):
         return self.get('uploader')
 
+    def channel_id(self):
+        return self.get('uploader_id')
+
     def id(self):
         return self.get('id')
 
@@ -170,6 +173,7 @@ def build_doc(info):
     return {
         'title': info.title(),
         'channel': info.channel(),
+        'channel_id': info.channel_id(),
         'upload_date': info.upload_date(),
         'language': info.language(),
         'timestamps': timestamps,
