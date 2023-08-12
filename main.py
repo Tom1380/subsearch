@@ -53,11 +53,65 @@ class DownloadInfo:
         return self.get('language')
 
 
-def download_subs(youtube_id):
+# Is it a Youtube channel URL?
+def is_channel(url):
+    # Youtube video IDs don't contain @.
+    return '@' in url
+
+
+def get_video_ids_from_channel(channel_url):
     uuid = generate_uuid()
 
+    filename = f'{uuid}.txt'
+
     ctx = {
-        "outtmpl": uuid,
+        'extract_flat': 'in_playlist',
+        'ignoreerrors': True,
+        'print_to_file': {
+            'video': [('id', filename)]
+        }
+    }
+
+    with YoutubeDL(ctx) as ydl:
+        ydl.download([channel_url])
+
+    ids = open(filename, 'r').readlines()
+    os.remove(filename)
+
+    return ids
+
+
+def handle_channel(url):
+    # Turn e.g. @lucy into https://www.youtube.com/@lucy/videos
+    # so yt-dlp can work with it.
+    if url.startswith('@'):
+        url = f'https://www.youtube.com/{url}/videos'
+
+    ids = get_video_ids_from_channel(url)
+
+    for id in tqdm(ids):
+        handle_video(id)
+
+
+def handle_video(url):
+    info = download_subs(url)
+
+    if info is None:
+        print('No subtitles available?')
+        return
+
+    doc = build_doc(info)
+
+    print(doc)
+
+    os.remove(info.filename)
+
+    save_to_es(es, doc, id=info.id())
+
+
+def download_subs(youtube_id):
+    ctx = {
+        "outtmpl": '%(id)s',
         'logtostderr': True,
         'skip_download': True,
         'writeautomaticsub': True,
@@ -175,18 +229,9 @@ urls = [
     'https://youtu.be/aR8q3uDSdb4',
 ]
 
-
 for url in tqdm(urls):
-    info = download_subs(url)
-
-    if info is None:
-        print('No subtitles available?')
-        continue
-
-    doc = build_doc(info)
-
-    print(doc)
-
-    os.remove(info.filename)
-
-    save_to_es(es, doc, id=info.id())
+    if is_channel(url):
+        print(f"Downloading videos from channel! URL: {url}")
+        handle_channel(url)
+    else:
+        handle_video(url)
