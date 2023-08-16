@@ -94,6 +94,11 @@ def handle_channel(url):
 
 
 def handle_video(url):
+    url = url.strip()
+    if es.exists(index="new2-index", id=url):
+        print(f'The video with id {url} is already in the DB')
+        return
+
     info = download_subs(url)
 
     if info is None:
