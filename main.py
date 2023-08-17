@@ -102,7 +102,6 @@ def handle_video(url):
     info = download_subs(url)
 
     if info is None:
-        print('No subtitles available yet')
         return
 
     doc = build_doc(info)
@@ -125,10 +124,15 @@ def download_subs(youtube_id):
 
     # TODO handle videos that still have to premiere.
     with YoutubeDL(ctx) as ydl:
-        info_dict = ydl.extract_info(
-            youtube_id,
-            download=True,
-        )
+        try:
+            info_dict = ydl.extract_info(
+                youtube_id,
+                download=True,
+            )
+        except Exception as e:
+            print("Exception caught:")
+            print(e)
+            return None
 
     try:
         # TODO delete the files from the ignored subtitles.
@@ -149,6 +153,7 @@ def download_subs(youtube_id):
         if video_is_older_than_15_days(info_dict):
             print('This video doesn\'t have subtitles and it\'s old')
             return DownloadInfo(None, info_dict)
+        print('No subtitles available yet')
         return None
 
 
