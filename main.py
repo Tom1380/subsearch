@@ -9,7 +9,7 @@ import uuid
 from elasticsearch import Elasticsearch
 import warnings
 from elasticsearch.exceptions import ElasticsearchWarning
-from datetime import datetime
+from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
 import io
 from tqdm import tqdm
@@ -102,14 +102,12 @@ def handle_video(url):
     info = download_subs(url)
 
     if info is None:
-        print('No subtitles available?')
+        print('No subtitles available yet')
         return
 
     doc = build_doc(info)
 
     print(doc)
-
-    os.remove(info.filename)
 
     save_to_es(es, doc, id=info.id())
 
@@ -147,7 +145,18 @@ def download_subs(youtube_id):
         filename = req_subtitles[0]['filepath']
         return DownloadInfo(filename, info_dict)
     except:
+        # If the video is younger than 15 days, the automatic subs might still be processing.
+        if video_is_older_than_15_days(info_dict):
+            print('This video doesn\'t have subtitles and it\'s old')
+            return DownloadInfo(None, info_dict)
         return None
+
+
+def video_is_older_than_15_days(info_dict):
+    upload_date = info_dict['upload_date']
+    upload_date = datetime.strptime(upload_date, "%Y%m%d")
+    now = datetime.now()
+    return (now - upload_date) > timedelta(days=15)
 
 
 def save_to_es(es, doc, id):
@@ -205,12 +214,14 @@ def build_subs_and_timestamps(paragraphs):
 
 
 def build_doc(info):
-    tree = ET.parse(info.filename)
-    root = tree.getroot()
-
-    paragraphs = root.findall('.//{http://www.w3.org/ns/ttml}p')
-
-    subs, timestamps = build_subs_and_timestamps(paragraphs)
+    if info.filename is not None:
+        tree = ET.parse(info.filename)
+        root = tree.getroot()
+        paragraphs = root.findall('.//{http://www.w3.org/ns/ttml}p')
+        subs, timestamps = build_subs_and_timestamps(paragraphs)
+        os.remove(info.filename)
+    else:
+        subs, timestamps = None, None
 
     return {
         'title': info.title(),
