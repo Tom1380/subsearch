@@ -1,3 +1,4 @@
 elasticsearch
 yt-dlp
 tqdm
+flask
