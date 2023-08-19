@@ -81,7 +81,7 @@ def get_video_ids_from_channel(channel_url):
     return ids
 
 
-def handle_channel(url):
+def handle_channel(es, url):
     # Turn e.g. @lucy into https://www.youtube.com/@lucy/videos
     # so yt-dlp can work with it.
     if url.startswith('@'):
@@ -90,10 +90,10 @@ def handle_channel(url):
     ids = get_video_ids_from_channel(url)
 
     for id in tqdm(ids):
-        handle_video(id)
+        handle_video(es, id)
 
 
-def handle_video(url):
+def handle_video(es, url):
     url = url.strip()
     if es.exists(index="new2-index", id=url):
         print(f'The video with id {url} is already in the DB')
@@ -239,21 +239,26 @@ def build_doc(info):
     }
 
 
-es = Elasticsearch(
-    hosts="http://localhost:9200",
-    basic_auth=('elastic', 'changeme'),
-    verify_certs=False
-)
+def main():
+    es = Elasticsearch(
+        hosts="http://localhost:9200",
+        basic_auth=('elastic', 'changeme'),
+        verify_certs=False
+    )
 
-urls = [
-    'https://youtu.be/8i4EEb5QMgU',
-    'https://youtu.be/X1SffRGMBEU',
-    'https://youtu.be/aR8q3uDSdb4',
-]
+    urls = [
+        'https://youtu.be/8i4EEb5QMgU',
+        'https://youtu.be/X1SffRGMBEU',
+        'https://youtu.be/aR8q3uDSdb4',
+    ]
 
-for url in tqdm(urls):
-    if is_channel(url):
-        print(f"Downloading videos from channel! URL: {url}")
-        handle_channel(url)
-    else:
-        handle_video(url)
+    for url in tqdm(urls):
+        if is_channel(url):
+            print(f"Downloading videos from channel! URL: {url}")
+            handle_channel(es, url)
+        else:
+            handle_video(es, url)
+
+
+if __name__ == '__main__':
+    main()
