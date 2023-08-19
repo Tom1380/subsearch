@@ -239,26 +239,17 @@ def build_doc(info):
     }
 
 
-def main():
+def downloader_routine(queue):
     es = Elasticsearch(
         hosts="http://localhost:9200",
         basic_auth=('elastic', 'changeme'),
         verify_certs=False
     )
 
-    urls = [
-        'https://youtu.be/8i4EEb5QMgU',
-        'https://youtu.be/X1SffRGMBEU',
-        'https://youtu.be/aR8q3uDSdb4',
-    ]
-
-    for url in tqdm(urls):
+    while True:
+        url = queue.get(block=True)
         if is_channel(url):
             print(f"Downloading videos from channel! URL: {url}")
             handle_channel(es, url)
         else:
             handle_video(es, url)
-
-
-if __name__ == '__main__':
-    main()
