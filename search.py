@@ -68,11 +68,13 @@ def search_subs(text):
     seconds = time.second + 60 * time.minute + (60**2) * time.hour
     id = hit['_id']
     title = hit['_source']['title']
+    channel = hit['_source']['channel']
     link = f'https://youtube.com/watch?v={id}&t={seconds}'
 
     return {
         'id': id,
         'title': title,
+        'channel': channel,
         'time': timestamp,
         'link': link,
         'matching_text': matching_text
