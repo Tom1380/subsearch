@@ -221,8 +221,8 @@ def build_subs_and_timestamps(paragraphs):
 def build_doc(info):
     if info.filename is not None:
         paragraphs = get_paragraphs_from_ttml(info.filename)
-        subs, timestamps = build_subs_and_timestamps(paragraphs)
         os.remove(info.filename)
+        subs, timestamps = build_subs_and_timestamps(paragraphs)
     else:
         subs, timestamps = None, None
 
