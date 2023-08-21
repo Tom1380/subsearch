@@ -38,4 +38,9 @@ def search(text):
     return search_result
 
 
+@app.route('/backlog', methods=['GET'])
+def backlog():
+    return {'size': queue.qsize()}
+
+
 app.run(debug=True, host='0.0.0.0', port=2000, threaded=True)
