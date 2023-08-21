@@ -244,9 +244,8 @@ def get_paragraphs_from_ttml(filename):
     # https://youtu.be/a1rfL-ms_3o
     ttml = open(filename).read().replace('\x0c', '')
 
-    tree = ET.ElementTree(ET.fromstring(ttml))
-    root = tree.getroot()
-    return root.findall('.//{http://www.w3.org/ns/ttml}p')
+    ttml = ET.fromstring(ttml)
+    return ttml.findall('.//{http://www.w3.org/ns/ttml}p')
 
 
 def downloader_routine(queue):
