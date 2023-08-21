@@ -120,6 +120,7 @@ def download_subs(youtube_id):
         'writesubtitles': True,
         'sub_langs': 'en.*',
         'subtitlesformat': 'ttml',
+        'compat_opts': {'no-live-chat'},
     }
 
     # TODO handle videos that still have to premiere.
