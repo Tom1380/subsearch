@@ -136,18 +136,7 @@ def download_subs(youtube_id):
             return None
 
     try:
-        # TODO delete the files from the ignored subtitles.
-        req_subtitles = [
-            sub
-            for sub in info_dict['requested_subtitles'].values()
-            if sub['ext'] == 'ttml'
-        ]
-        # I don't know if this situation can happen,
-        # I'd like to only download the "best" subtitle file available.
-        if len(req_subtitles) > 1:
-            print('More than one subtitle file found.')
-
-        filename = req_subtitles[0]['filepath']
+        filename = pick_subtitles(info_dict)
         return DownloadInfo(filename, info_dict)
     except:
         # If the video is younger than 15 days, the automatic subs might still be processing.
@@ -156,6 +145,36 @@ def download_subs(youtube_id):
             return DownloadInfo(None, info_dict)
         print('No subtitles available yet')
         return None
+
+
+def pick_subtitles(info_dict):
+    requested_subtitles = info_dict['requested_subtitles']
+    suitable_subtitles = [
+        key
+        for key, value in requested_subtitles.items()
+        if value['ext'] == 'ttml'
+    ]
+
+    if len(suitable_subtitles) == 0:
+        # Cleanup.
+        delete_subtitle_files(requested_subtitles)
+        raise BaseException("No suitable subtitles found.")
+    # I don't know if this situation can happen,
+    # I'd like to only download the "best" subtitle file available.
+    elif len(suitable_subtitles) != 1:
+        print('More than one suitable subtitle file found.')
+
+    chosen_subtitles = requested_subtitles.pop(suitable_subtitles[0])
+    # The chosen one was popped, so the remaining ones,
+    # if there are any, are the ignored ones.
+    delete_subtitle_files(requested_subtitles)
+
+    return chosen_subtitles['filepath']
+
+
+def delete_subtitle_files(subtitles):
+    for s in subtitles.values():
+        os.remove(s['filepath'])
 
 
 def video_is_older_than_15_days(info_dict):
