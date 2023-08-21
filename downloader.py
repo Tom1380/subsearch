@@ -220,9 +220,7 @@ def build_subs_and_timestamps(paragraphs):
 
 def build_doc(info):
     if info.filename is not None:
-        tree = ET.parse(info.filename)
-        root = tree.getroot()
-        paragraphs = root.findall('.//{http://www.w3.org/ns/ttml}p')
+        paragraphs = get_paragraphs_from_ttml(info.filename)
         subs, timestamps = build_subs_and_timestamps(paragraphs)
         os.remove(info.filename)
     else:
@@ -237,6 +235,18 @@ def build_doc(info):
         'timestamps': timestamps,
         'subs': subs,
     }
+
+
+def get_paragraphs_from_ttml(filename):
+    # We need to replace this character because it's invalid.
+    # https://stackoverflow.com/q/5742543/6878890
+    # I found the character in this video's TTML:
+    # https://youtu.be/a1rfL-ms_3o
+    ttml = open(filename).read().replace('\x0c', '')
+
+    tree = ET.ElementTree(ET.fromstring(ttml))
+    root = tree.getroot()
+    return root.findall('.//{http://www.w3.org/ns/ttml}p')
 
 
 def downloader_routine(queue):
