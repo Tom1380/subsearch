@@ -247,12 +247,15 @@ def build_subs_and_timestamps(paragraphs):
 
 
 def build_doc(info):
-    if info.filename is not None:
-        paragraphs = get_paragraphs_from_ttml(info.filename)
-        os.remove(info.filename)
-        subs, timestamps = build_subs_and_timestamps(paragraphs)
-    else:
-        subs, timestamps = None, None
+    if info.filename is None:
+        # Return an empty doc to save in the index.
+        # It's saved to keep the ID so that we can skip
+        # downloading this video the next time we're asked to.
+        return {}
+
+    paragraphs = get_paragraphs_from_ttml(info.filename)
+    os.remove(info.filename)
+    subs, timestamps = build_subs_and_timestamps(paragraphs)
 
     return {
         'title': info.title(),
