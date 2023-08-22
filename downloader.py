@@ -53,13 +53,25 @@ class DownloadInfo:
         return self.get('language')
 
 
+# Playlist in yt-dlp's jargon, so not just YT playlists, but also
+# channels and YT search results.
+def is_playlist(url):
+    return url.startswith('ytsearch') or is_channel(url) or is_youtube_playlist(url)
+
+
 # Is it a Youtube channel URL?
 def is_channel(url):
     # Youtube video IDs don't contain @.
     return '@' in url
 
 
-def get_video_ids_from_channel(channel_url):
+# Actual YT playlists.
+def is_youtube_playlist(url):
+    # They contain a list parameter in their URL.
+    return '&list=' in url
+
+
+def get_video_ids_from_playlist(playlist_url):
     uuid = generate_uuid()
 
     filename = f'{uuid}.txt'
@@ -73,7 +85,7 @@ def get_video_ids_from_channel(channel_url):
     }
 
     with YoutubeDL(ctx) as ydl:
-        ydl.download([channel_url])
+        ydl.download([playlist_url])
 
     ids = open(filename, 'r').readlines()
     os.remove(filename)
@@ -81,13 +93,13 @@ def get_video_ids_from_channel(channel_url):
     return ids
 
 
-def handle_channel(es, url):
+def handle_playlist(es, url):
     # Turn e.g. @lucy into https://www.youtube.com/@lucy/videos
     # so yt-dlp can work with it.
     if url.startswith('@'):
         url = f'https://www.youtube.com/{url}/videos'
 
-    ids = get_video_ids_from_channel(url)
+    ids = get_video_ids_from_playlist(url)
 
     for id in tqdm(ids):
         handle_video(es, id)
@@ -273,8 +285,8 @@ def downloader_routine(queue):
 
     while True:
         url = queue.get(block=True)
-        if is_channel(url):
-            print(f"Downloading videos from channel! URL: {url}")
-            handle_channel(es, url)
+        if is_playlist(url):
+            print(f"Downloading videos from playlist! URL: {url}")
+            handle_playlist(es, url)
         else:
             handle_video(es, url)
