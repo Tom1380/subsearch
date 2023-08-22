@@ -189,35 +189,27 @@ def save_to_es(es, doc, id):
     es.index(index="new2-index", document=doc, id=id)
 
 
-def trim_newlines(text):
-    if len(text) != 0:
-        if text[0] == '\n':
-            text = text[1:]
-
-    if len(text) != 0:
-        if text[-1] == '\n':
-            text = text[:-1]
-
-    return text
-
-
 def extract_text(paragraph_element):
     text = paragraph_element.text
     if text is None:
         text = ''
     else:
-        text = trim_newlines(text)
+        text = text.strip('\n')
 
     # https://stackoverflow.com/a/61718777/6878890
     for subelem in paragraph_element:
-        tail = subelem.tail
-        if tail is None:
-            continue
+        subelem_text = subelem.text
+        if subelem_text is not None:
+            othertext = subelem_text.strip('\n')
+            if len(othertext) != 0:
+                text += othertext
 
-        othertext = trim_newlines(tail)
-        if len(othertext) != 0:
-            text += ' '
-            text += othertext
+        tail = subelem.tail
+        if tail is not None:
+            othertext = tail.strip('\n')
+            if len(othertext) != 0:
+                text += ' '
+                text += othertext
 
     return text
 
@@ -227,7 +219,11 @@ def build_subs_and_timestamps(paragraphs):
     timestamps = list()
     subs = []
     for p in paragraphs:
-        phrase = extract_text(p)
+        # Strip everything, not just newlines this time.
+        phrase = extract_text(p).strip()
+        if phrase == '':
+            continue
+
         subs.append(phrase)
         timestamps.append((p.get('begin'), index_in_text))
         # Because a newline will be added when the list is joined.
