@@ -5,6 +5,61 @@ import multiprocessing
 from downloader import downloader_routine
 from search import search_subs
 
+from elasticsearch import Elasticsearch, NotFoundError
+import warnings
+from elasticsearch.exceptions import ElasticsearchWarning
+# TODO fix the root cause, don't just filter the error.
+warnings.simplefilter('ignore', ElasticsearchWarning)
+
+
+# Check if the index exists.
+# If it doesn't, create it with the correct mappings.
+# If it does, assert that the mappings are correct.
+def setup_elasticsearch():
+    es = Elasticsearch(
+        hosts="http://localhost:9200",
+        basic_auth=('elastic', 'changeme'),
+        verify_certs=False
+    )
+
+    name = 'new2-index'
+
+    desired_mappings = {
+        "properties": {
+            "subs": {
+                "type": "text",
+                "term_vector": "with_positions_offsets"
+            },
+            "timestamps": {
+                "type": "object",
+                "enabled": False
+            }
+        }
+    }
+
+    try:
+        info = es.indices.get(index=name)
+    except NotFoundError:
+        print(f'The {name} Elasticsearch index wasn\'t found.')
+        print('Creating it...')
+        es.indices.create(index=name, mappings=desired_mappings)
+        return
+
+    actual_mappings = info[name]['mappings']
+
+    desired_properties = desired_mappings['properties']
+    actual_properties = actual_mappings['properties']
+
+    # If the desired properties are not a subset of the actual ones,
+    # there are conflicts.
+    # You're allowed to have other fields,
+    # but the 'subs' and 'timestamps' fields need to be set correctly.
+    if not desired_properties.items() <= actual_properties.items():
+        print(
+            f'The mappings for the {name} Elasticsearch index are incorrect.'
+        )
+        exit(1)
+
 
 def spawn_worker(queue):
     multiprocessing.Process(
@@ -43,4 +98,5 @@ def backlog():
     return {'size': queue.qsize()}
 
 
+setup_elasticsearch()
 app.run(debug=True, host='0.0.0.0', port=2000, threaded=True)
