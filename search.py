@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from elasticsearch import Elasticsearch, ElasticsearchWarning
 import warnings
 from datetime import datetime
