@@ -45,3 +45,15 @@ You can change the 10 if you want a different number of videos to be downloaded.
 ```bash
 curl -XPOST "localhost:2000/request_download/ytsearch10:query"
 ```
+
+### Running the crawler
+
+If you want to keep growing the index you need to constantly supply the API with new videos.
+
+I made a crawler to get hot topics and keywords from Google Trends and feed them to the API.
+
+
+To run it:
+```bash
+./crawler.py
+```
