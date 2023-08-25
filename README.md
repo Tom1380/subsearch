@@ -8,7 +8,7 @@ Given a Youtube video, the TTML subtitles are downloaded via yt-dlp.
 
 They are parsed, translated to a JSON document and fed into Elasticsearch.
 
-When searching for a phrase, the ES index is queried. Looking at the ID,highlights and timestamps, the relevant video and timestamp is found and a link is built.
+When searching for a phrase, the ES index is queried. Looking at the ID, highlights and timestamps, the relevant video and timestamp is found and a link is built.
 
 There's also an external crawler that uses Google Trends to find hot topics and keywords to feed to the API.
 
