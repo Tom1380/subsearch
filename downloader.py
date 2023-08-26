@@ -267,11 +267,17 @@ def build_doc(info):
 
 
 def get_paragraphs_from_ttml(filename):
-    # We need to replace this character because it's invalid.
+    ttml = open(filename).read()
+
+    # We need to remove the this character because it's invalid.
     # https://stackoverflow.com/q/5742543/6878890
     # I found the character in this video's TTML:
     # https://youtu.be/a1rfL-ms_3o
-    ttml = open(filename).read().replace('\x0c', '')
+    ttml = ttml.replace('\x0c', '')
+
+    # A lot of videos seem to use ’,
+    # but it's better to be consistent for searches.
+    ttml = ttml.replace('’', '\'')
 
     ttml = ET.fromstring(ttml)
     return ttml.findall('.//{http://www.w3.org/ns/ttml}p')
