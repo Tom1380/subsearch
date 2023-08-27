@@ -11,10 +11,15 @@ es = Elasticsearch(
 )
 
 
-def search_in_es(text, channel_id, es):
-    must_list = [{
-        "match_phrase": {"subs":  text}
-    }]
+def search_in_es(text, exact_match, channel_id, es):
+    if exact_match:
+        must_list = [{
+            "match_phrase": {"subs":  text}
+        }]
+    else:
+        must_list = [{
+            "match": {"subs":  text}
+        }]
 
     if channel_id is not None:
         must_list.append({
@@ -48,8 +53,8 @@ def find_timestamp(timestamps, index_to_find):
             return prev_timestamp
 
 
-def search_subs(text, channel_id):
-    resp = search_in_es(text, channel_id, es)
+def search_subs(text, exact_match, channel_id):
+    resp = search_in_es(text, exact_match, channel_id, es)
 
     return [
         build_video_object(hit)

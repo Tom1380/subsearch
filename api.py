@@ -87,9 +87,15 @@ def request_download(id):
 
 @app.route('/search/<text>', methods=['GET'])
 def search(text):
+    # Should we only match if we find the exact phrase?
+    # In other words,
+    # should we "match_phrase" or just "match" on the subs field?
+    exact_match = request.args.get('exact')
+    exact_match = False if exact_match == 'f' else True
+
     channel_id = request.args.get('channel_id')
 
-    search_results = search_subs(text, channel_id)
+    search_results = search_subs(text, exact_match, channel_id)
 
     return jsonify(search_results)
 
