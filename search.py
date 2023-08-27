@@ -28,7 +28,7 @@ def search_in_es(text, es):
                 }
             }
         },
-        size=1,
+        size=3,
     )
 
 
@@ -44,14 +44,36 @@ def find_timestamp(timestamps, index_to_find):
 def search_subs(text):
     resp = search_in_es(text, es)
 
-    try:
-        hit = resp['hits']['hits'][0]
-        highlight = hit['highlight']['subs'][0]
-        subs = hit['_source']['subs']
-        timestamps = hit['_source']['timestamps']
-    except:
-        return None
+    return [
+        build_video_object(hit)
+        for hit in resp['hits']['hits']
+    ]
 
+
+def build_video_object(hit):
+    highlights = hit['highlight']['subs']
+    source = hit['_source']
+
+    id = hit['_id']
+    subs = source['subs']
+    timestamps = source['timestamps']
+    title = source['title']
+    channel = source['channel']
+
+    video_matches = [
+        build_match_object(highlight, id, subs, timestamps)
+        for highlight in highlights
+    ]
+
+    return {
+        'id': id,
+        'title': title,
+        'channel': channel,
+        'matches': video_matches
+    }
+
+
+def build_match_object(highlight, id, subs, timestamps):
     h = highlight \
         .replace('<em>', '') \
         .replace('</em>', '')
@@ -64,16 +86,14 @@ def search_subs(text):
     time = datetime.strptime(timestamp, "%H:%M:%S.%f")
     # Ignores milliseconds.
     seconds = time.second + 60 * time.minute + (60**2) * time.hour
-    id = hit['_id']
-    title = hit['_source']['title']
-    channel = hit['_source']['channel']
+
     link = f'https://youtube.com/watch?v={id}&t={seconds}'
 
     return {
-        'id': id,
-        'title': title,
-        'channel': channel,
+        'matching_text': matching_text,
         'time': timestamp,
-        'link': link,
-        'matching_text': matching_text
+        'link': link
     }
+
+
+# TODO don't return the same timestamp when highlights have the same text.
