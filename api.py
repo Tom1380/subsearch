@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from flask import Flask, Response
+from flask import Flask, Response, request, jsonify
 import multiprocessing
 from downloader import downloader_routine
 from search import search_subs
@@ -87,10 +87,11 @@ def request_download(id):
 
 @app.route('/search/<text>', methods=['GET'])
 def search(text):
-    if (search_result := search_subs(text)) is None:
-        return Response(status=404)
+    channel_id = request.args.get('channel_id')
 
-    return search_result
+    search_results = search_subs(text, channel_id)
+
+    return jsonify(search_results)
 
 
 @app.route('/backlog', methods=['GET'])
