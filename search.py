@@ -97,8 +97,8 @@ def build_match_object(highlight, id, subs, timestamps):
     # TODO remove when confident
     assert h == subs[index:index+len(h)]
     matching_text = subs[index:index+len(h)]
-    timestamp = find_timestamp(timestamps, index)
-    print(timestamp, id, index)
+
+    timestamp = find_timestamp(timestamps, index) 
     time = datetime.strptime(timestamp, "%H:%M:%S.%f")
     # Ignores milliseconds.
     seconds = time.second + 60 * time.minute + (60**2) * time.hour
