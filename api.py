@@ -76,7 +76,7 @@ def spawn_workers(n, queue):
 app = Flask(__name__)
 queue = multiprocessing.Queue()
 
-spawn_workers(4, queue)
+spawn_workers(8, queue)
 
 
 @app.route('/request_download/<id>', methods=['POST'])
