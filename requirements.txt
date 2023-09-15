@@ -2,3 +2,4 @@ elasticsearch
 yt-dlp
 tqdm
 flask
+pytrends
