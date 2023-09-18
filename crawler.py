@@ -26,16 +26,17 @@ def get_trending_searches():
 
 
 while True:
-    trending_searches = get_trending_searches()
+    backlog = requests.get('http://localhost:2000/backlog').json()['size']
+    if backlog == 0:
+        trending_searches = get_trending_searches()
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print(f'{len(trending_searches)} queries at {current_time}')
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print(f'{len(trending_searches)} queries at {current_time}')
 
-    for ts in trending_searches:
-        requests.post(
-            f'http://localhost:2000/request_download/ytsearch5:{ts}'
-        )
+        for ts in trending_searches:
+            requests.post(
+                f'http://localhost:2000/request_download/ytsearch15:{ts}'
+            )
 
-    # An hour
-    time.sleep(60 * 60)
+    time.sleep(20)
