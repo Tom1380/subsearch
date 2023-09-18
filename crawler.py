@@ -22,7 +22,7 @@ def get_trending_searches_for_country(pn):
 
 def get_trending_searches():
     f = get_trending_searches_for_country
-    return f('GB') | f('AU') | f('US')
+    return f('GB') | f('AU') | f('US') | f('NZ') | f('IE') | f('CA')
 
 
 while True:
