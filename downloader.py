@@ -66,7 +66,7 @@ def is_channel(url):
 # Actual YT playlists.
 def is_youtube_playlist(url):
     # They contain a list parameter in their URL.
-    return '&list=' in url
+    return '?list=' in url or '&list=' in url
 
 
 def get_video_ids_from_playlist(playlist_url):
