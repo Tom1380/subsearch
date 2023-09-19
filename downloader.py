@@ -105,7 +105,7 @@ def handle_playlist(es, url):
 
 def handle_video(es, url):
     url = url.strip()
-    if es.exists(index="new2-index", id=url):
+    if es.exists(index="subsearch-index", id=url):
         print(f'The video with id {url} is already in the DB')
         return
 
@@ -196,7 +196,7 @@ def video_is_older_than_15_days(info_dict):
 
 def save_to_es(es, doc, id):
     assert id is not None
-    es.index(index="new2-index", document=doc, id=id)
+    es.index(index="subsearch-index", document=doc, id=id)
 
 
 def extract_text(paragraph_element):

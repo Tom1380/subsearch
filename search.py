@@ -27,7 +27,7 @@ def search_in_es(text, exact_match, channel_id, es):
         })
 
     return es.search(
-        index="new2-index",
+        index="subsearch-index",
         query={
             "bool": {
                 "must": must_list
