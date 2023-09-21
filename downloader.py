@@ -76,7 +76,6 @@ def get_video_ids_from_playlist(playlist_url):
 
     ctx = {
         'extract_flat': 'in_playlist',
-        'ignoreerrors': True,
         'print_to_file': {
             'video': [('id', filename)]
         }
@@ -292,8 +291,11 @@ def downloader_routine(queue):
 
     while True:
         url = queue.get(block=True)
-        if is_playlist(url):
-            print(f"Downloading videos from playlist! URL: {url}")
-            handle_playlist(es, url)
-        else:
-            handle_video(es, url)
+        try:
+            if is_playlist(url):
+                print(f"Downloading videos from playlist! URL: {url}")
+                handle_playlist(es, url)
+            else:
+                handle_video(es, url)
+        except Exception as e:
+            print(f'Caught exception {type(e).__name__}: {e}')
