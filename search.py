@@ -27,7 +27,7 @@ def search_in_es(text, exact_match, channel_id, es):
         })
 
     return es.search(
-        index="subsearch-index",
+        index="subsearch",
         query={
             "bool": {
                 "must": must_list
@@ -98,7 +98,7 @@ def build_match_object(highlight, id, subs, timestamps):
     assert h == subs[index:index+len(h)]
     matching_text = subs[index:index+len(h)]
 
-    timestamp = find_timestamp(timestamps, index) 
+    timestamp = find_timestamp(timestamps, index)
     time = datetime.strptime(timestamp, "%H:%M:%S.%f")
     # Ignores milliseconds.
     seconds = time.second + 60 * time.minute + (60**2) * time.hour

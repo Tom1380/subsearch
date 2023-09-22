@@ -22,7 +22,7 @@ def setup_elasticsearch():
         verify_certs=False
     )
 
-    name = 'subsearch-index'
+    name = 'subsearch'
 
     desired_mappings = {
         "properties": {
