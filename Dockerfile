@@ -26,7 +26,5 @@ RUN /etc/init.d/elasticsearch start && \
 
 
 RUN python3 -m pip install -r requirements.txt
-RUN python3 -m pip install -U pip setuptools wheel
-RUN python3 -m pip install --force-reinstall https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz
 
 CMD /etc/init.d/elasticsearch start && sleep 60 && ./api.py
