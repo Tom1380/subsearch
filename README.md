@@ -41,7 +41,7 @@ curl -XPOST "localhost:2000/request_download/@TheOffice"
 
 #### Youtube search results
 This downloads the subs from the first *10* results for the query `query`.
-You can change the 10 if you want a different number of videos to be downloaded.
+You can change the 10 if you want to download a different number of videos.
 ```bash
 curl -XPOST "localhost:2000/request_download/ytsearch10:query"
 ```
